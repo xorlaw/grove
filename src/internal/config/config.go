@@ -36,3 +36,12 @@ func defaults() Config {
 	}
 }
 
+func configPath() (string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", fmt.Errorf("finding home directory: %w", err)
+	}
+	return filepath.Join(home, ".config", "grove", "grove.toml"), nil
+}
+
+
