@@ -41,6 +41,21 @@ type Deps struct {
 	Requires	[]string `toml:"requires"`
 }
 
+func (g *Grovefile) validate() error {
+	if strings.TrimSpace(g.Package.Name) == "" {
+		return fmt.Errorf("Grovefile: [package] name is required")
+	}
+
+	if strings.TrimSpace(g.Package.Version) == "" {
+		return fmt.Errorf("Grovefile: [package] version is required")
+	}
+
+	if strings.TrimSpace(g.Source.Primary) == "" {
+		return fmt.Errorf("Grovefile: [source] primary is required")
+	}
+	return nil
+}
+
 
 func Parse(path string) (*Grovefile, error) {
 	data, err := os.ReadFile(path)
