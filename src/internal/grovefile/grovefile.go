@@ -42,3 +42,31 @@ type Deps struct {
 }
 
 
+func Parse(path string) (*Grovefile, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("reading Grovefile: %w", err)
+	}
+
+	var gf Grovefile
+	if _, err := toml.Decode(string(data), &gf); err != nil {
+		return nil, fmt.Errorf("parsing Grovefile: %w", err)
+	}
+
+	return &gf, nil
+}
+
+func FindAndParse(dir string) (*Grovefile, error) {
+	path := filepath.Join(dir, Filename)
+	return Parse(path)
+}
+
+
+
+
+
+
+
+
+
+
