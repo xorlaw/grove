@@ -25,4 +25,14 @@ type Source struct {
 	Type 		string		`toml:"type"` // grove or github
 }
 
+func defaults() Config {
+	home, _ := os.UserHomeDir()
+	return Config{
+		Client: Client{
+			InstallDir:	"/usr/local",
+			DBPath:		filepath.Join(home, ".local", "share", "grove", "packages.toml"),
+			CacheDir:	filepath.Join(home, ".cache", "grove"),
+		},
+	}
+}
 
