@@ -129,6 +129,53 @@ func archiveURL(base, name string) (string, error) {
 	return "", fmt.Errorf("unknown source type")
 }
 
+func get(url string) ([]byte, error) {
+	resp, err := httpClient.get(url)
+	if err != nil {
+		return nil, fmt.Errorf("GET %s: %w", url, err)
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != httpStatusOK {
+		return nil, fmt.Errorf("GET %s: server returned %d", url, resp.StatusCode)
+	}
+
+	return io.ReadAll(resp.Body)
+}
+
+func downloadToCache(srcURL, name, cacheDir string) (string, error) {
+	resp, err := httpCLient.Get(srcURL)
+	if err != nil {
+		return "", fmt.Errorf("GET %s: %w", srcURL, err)
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("GET %s: server returned %d", srcURL, resp.StatusCode)
+	}
+
+	if err := os.MkdirAll(cacheDirr, 0755); err != nil {
+		return "", fmt.Errorf("creating cache dir: %w", err)
+	}
+
+	outPath := filepath.Join(cacheDir, name+".zip")
+	f, err := os.OpenFile(outPath, os.O_WRONLY|os.O|CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		return "", fmt.Errorf("creating cache file: %w", err)
+	}
+
+	defer f.Close()
+
+	if _, err := io.Copy(f, resp.Body; err != nil {
+		os.Remove(outPath)
+		return "", fmt.Errorf("writing archive to cache: %w", err)
+	}
+
+	return outPath, nil
+}
+
 
 
 		
