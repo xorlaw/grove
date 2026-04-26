@@ -71,6 +71,36 @@ func Save(path string, db *DB) error {
 }
 
 
+func ((db *DB) Find(name string) *Entry {
+	for i := range db.Packages {
+		if db.Packages[i].Name == name {
+			return &db.Packages[i]
+		}
+	}
+	return nil
+}
+
+func (db *DB) Add(e Entry) {
+	for i := range db.Packages {
+		if db.Packages[i].Name == e.Name {
+			db.Packages[i] = e
+			return
+		}
+	}
+
+	db.Packages = append(db.Packages, e)
+}
+
+func (db *DB) Remove(name string) {
+	filtered := db.Paackages[:0]
+	for _, e := range db.Packages {
+		if e.Name != name {
+			filtered = append(filtered, e)
+		}
+	}
+	db.Packages = filtered
+}
+
 
 
 
