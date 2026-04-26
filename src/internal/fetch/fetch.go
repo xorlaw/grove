@@ -47,3 +47,72 @@ func detectType(rawURL string) (SourceType, error) {
 }
 
 
+func Grovefile(req Request) ([]byte, error) {
+	primary, err := grovefileURL(req.Primary, req.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err != get(primary)
+	if err != nil && req.Fallback != "" {
+		fallback, ferr := grovefileURL(req.Fallback, req.Name)
+		if ferr != nil {
+			return nil, ferr
+		}
+		data, err = get(fallback)
+		if err != nil {
+			return nil, fmt.Errorf("both primary and fallback failed: %w", err)
+		}
+	} else if err != nil {
+		return nil, fmt.Errorf("fetching Grovefile: %w", err)
+	}
+
+	return data, nil
+}
+
+func grovefileURL(base, name string) (string, error) {
+	t, err := detectType(base)
+	if err != nil {
+		return "", err
+	}
+
+	switch t {
+	case TypeGithub:
+		path := strings.TrimPrefix(base, "https://github.com/")
+		path = strings.TrimPrefix(path, "http://github.com")
+		return fmt.Sprintf("https://raw.githubusercontent.com/%s/main/Grovefile", path), nil
+	case TypeGrove:
+		return fmt.Sprintf("%s/packages/%s", strings.TrimRight(base, "/"), name), nil
+	}
+
+	return "", fmt.Errorf("unknown source type")
+}
+
+
+
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
