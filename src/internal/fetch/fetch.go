@@ -88,6 +88,47 @@ func grovefileURL(base, name string) (string, error) {
 	return "", fmt.Errorf("unknown source type")
 }
 
+func Archive(req Request) (string, error) {
+	primary, err := archiveURL(req,Primary, req.Name)
+	if err != nil {
+		return "", err
+	}
+
+	out, err := downloadToCache(primary, req.Name, req.CacheDir)
+	if err != nil && req.Fallback != "" {
+		fallback, ferr := archiveURL(req.Fallback, req.Name)
+		if ferr != nil {
+			return "", ferr
+		}
+		out, err = downloadToCache(fallback, req.Name, req.CacheDir)
+		if err != nil {
+			return "", fmt.Errorf("both primary and fallback failed: %w", err)
+		}
+	} else if err != nil {
+		return "", fmt.Errorf("downloading archive: %w", err)
+	}
+
+	return out, nil
+}
+
+func archiveURL(base, name string) (string, error) {
+	t, err := detectType(base)
+	if err != nil {
+		return "", err
+	}
+
+	switch t {
+	case TypeGithub:
+		path := strings.TrimPrefix(base, "https://github.com/")
+		path = strings.TrimPrefix(path, "http://github.com/")
+		return fmt.Sprintf("https://github.com/%s/archive/refs/heads/main.zip", path), nil
+	case TypeGrove:
+		return fmt.Sprintf("%s/packages/%s/archive", strings.TrimRight(base, "/"), name), nil
+	}
+
+	return "", fmt.Errorf("unknown source type")
+}
+
 
 
 		
